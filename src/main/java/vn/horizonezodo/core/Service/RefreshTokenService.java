@@ -28,7 +28,7 @@ public class RefreshTokenService {
     public Optional<RefreshToken> findByToken(String token){
         return repo.findByToken(token);
     }
-
+    @Transactional
     public RefreshToken createRefreshToken(Long userId){
         RefreshToken refreshToken = new RefreshToken();
         User user = service.getUserById(userId).orElseThrow(() -> new MessageException("Không tìm thấy user theo id: " + userId));
@@ -38,7 +38,7 @@ public class RefreshTokenService {
         refreshToken = repo.save(refreshToken);
         return refreshToken;
     }
-
+    @Transactional
     public RefreshToken updateRefreshToken(String token){
         RefreshToken refreshToken = repo.findByToken(token).orElseThrow(() -> new MessageException("Không tìm thấy refresh token"));
         refreshToken.setToken(UUID.randomUUID().toString());

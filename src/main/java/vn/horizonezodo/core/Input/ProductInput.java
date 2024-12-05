@@ -1,18 +1,17 @@
-package vn.horizonezodo.core.Entity;
+package vn.horizonezodo.core.Input;
 
-import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.Id;
 import java.util.List;
 
-@Document(collection = "products")
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class Product {
-    @Id
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductInput {
     private String productId;
     private String productName;
     private String productDescription;
@@ -20,7 +19,7 @@ public class Product {
     private long updateAt;
     private String thumbImg;
     private List<String> listImg;
-    private int viewCount;
+    private int saleCount;
     private boolean isTop;
     private String categoryId;
     private boolean isActivate;

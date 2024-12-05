@@ -1,11 +1,12 @@
 package vn.horizonezodo.core.Entity;
 
 public enum ORDERSTATUS {
-    DEPOSITED,
+    OPEN,
     PURCHASED,
     DELIVERY,
     DELIVERED,
     CANCELLED,
     LOST,
+    SUCCESS,
     RETURN
 }
