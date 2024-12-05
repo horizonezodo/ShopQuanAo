@@ -45,8 +45,8 @@ public class UserService {
                 .orElse(Optional.empty());
     }
 
-    public boolean checkUser(String info){
-        return repo.existsByEmail(info) || repo.existsByPhone(info);
+    public boolean checkUser(String email,String phone){
+        return repo.existsByEmail(email) || repo.existsByPhone(phone);
     }
 
     @Transactional
@@ -55,6 +55,7 @@ public class UserService {
         wallet.setAmount(BigDecimal.ZERO);
         wallet.setLockWallet(false);
         walletRepo.save(wallet);
+
         User user = new User();
         user.setUsername(input.getUserName());
         user.setEmail(input.getEmail());
