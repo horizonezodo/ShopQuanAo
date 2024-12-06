@@ -8,7 +8,7 @@ import vn.horizonezodo.core.Entity.User;
 import vn.horizonezodo.core.Entity.Wallet;
 import vn.horizonezodo.core.MongoRepo.OrderHistoryRepo;
 import vn.horizonezodo.core.Output.Message;
-import vn.horizonezodo.core.Repo.OrderHistoryInput;
+import vn.horizonezodo.core.Input.OrderHistoryInput;
 
 import javax.transaction.Transactional;
 

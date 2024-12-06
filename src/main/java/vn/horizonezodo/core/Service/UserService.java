@@ -2,8 +2,6 @@ package vn.horizonezodo.core.Service;
 
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.spel.ast.OpOr;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.horizonezodo.core.Entity.Role;
 import vn.horizonezodo.core.Entity.User;
@@ -24,9 +22,6 @@ public class UserService {
 
     @Autowired
     private UserRepo repo;
-
-    @Autowired
-    private PasswordEncoder encoder;
 
     @Autowired
     private RoleService roleService;
@@ -59,7 +54,7 @@ public class UserService {
         User user = new User();
         user.setUsername(input.getUserName());
         user.setEmail(input.getEmail());
-        user.setPassword(encoder.encode(input.getPassword()));
+        user.setPassword(input.getPassword());
         Role role = roleService.findByRoleName(input.getRole()).orElseThrow(() -> new MessageException("Role not found exception"));
         user.setRole(role);
         user.setWallet(wallet);
@@ -117,10 +112,8 @@ public class UserService {
     @Transactional
     public Message changePassword(UserInput input){
         User user = getUserByInfo(input.getEmail()).orElseThrow(() -> new MessageException("Không tìm thấy user theo email"));
-        if(encoder.matches(input.getPassword(), user.getPassword())){
-            return new Message("It is your old pass");
-        }
-        user.setPassword(encoder.encode(input.getPassword()));
+        user.setPassword(input.getPassword());
+        user.setDayUpdate(System.currentTimeMillis());
         repo.save(user);
         return new Message("Change user pass success");
     }
@@ -138,7 +131,14 @@ public class UserService {
     public Message lockUser(UserInput input){
         User user = getUserByInfo(input.getEmail()).orElseThrow(() -> new MessageException("Không tìm thấy user theo email"));
         user.setLock(true);
+        Wallet wallet = user.getWallet();
+        wallet.setLockWallet(true);
+        walletRepo.save(wallet);
         repo.save(user);
         return new Message("Lock user success");
+    }
+
+    public boolean checkLockUser(User user){
+        return user.isLock();
     }
 }

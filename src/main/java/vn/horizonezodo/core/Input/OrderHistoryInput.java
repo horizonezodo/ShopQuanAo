@@ -1,4 +1,4 @@
-package vn.horizonezodo.core.Repo;
+package vn.horizonezodo.core.Input;
 
 import lombok.Getter;
 import lombok.Setter;

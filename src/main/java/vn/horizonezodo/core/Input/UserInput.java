@@ -19,4 +19,5 @@ public class UserInput {
     private String img;
     private String role;
     private boolean activate;
+    private String verifyEmailToken;
 }

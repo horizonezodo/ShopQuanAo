@@ -24,24 +24,24 @@ public class JwtUntil {
     @Value("${jwtExpirationMs}")
     private long jwtDurationMs;
 
-    @Value("${bezkoder.app.jwtCookieName}")
+    @Value("${jwtCookieName}")
     private String jwtCookie;
 
-    @Value("${bezkoder.app.jwtRefreshCookieName}")
+    @Value("${jwtRefreshCookieName}")
     private String jwtRefreshCookie;
 
     public ResponseCookie generateJwtCookie(UserDetailImpl userPrincipal) {
         String jwt = generateTokenFromData(userPrincipal.getEmail());
-        return generateCookie(jwtCookie, jwt, "/api");
+        return generateCookie(jwtCookie, jwt, "/service");
     }
 
     public ResponseCookie generateJwtCookie(User user) {
         String jwt = generateTokenFromData(user.getEmail());
-        return generateCookie(jwtCookie, jwt, "/api");
+        return generateCookie(jwtCookie, jwt, "/service");
     }
 
     public ResponseCookie generateRefreshJwtCookie(String refreshToken) {
-        return generateCookie(jwtRefreshCookie, refreshToken, "/api/auth/refreshtoken");
+        return generateCookie(jwtRefreshCookie, refreshToken, "/auth/refreshtoken");
     }
 
     public String getJwtFromCookies(HttpServletRequest request) {
@@ -58,7 +58,7 @@ public class JwtUntil {
     }
 
     public ResponseCookie getCleanJwtRefreshCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtRefreshCookie, null).path("/api/auth/refreshtoken").build();
+        ResponseCookie cookie = ResponseCookie.from(jwtRefreshCookie, null).path("/auth/refreshtoken").build();
         return cookie;
     }
 
