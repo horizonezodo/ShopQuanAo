@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -23,4 +24,14 @@ public class ProductInput {
     private boolean isTop;
     private String categoryId;
     private boolean isActivate;
+    private String id;
+    private String colorName;
+    private String colorImg;
+    private String sizeName;
+    private String sizeDes;
+    private String sizeId;
+    private double price;
+    private int saleQuantity;
+    private boolean isStock;
+    private String colorId;
 }

@@ -20,7 +20,7 @@ public class Variant {
     private String productId;
     private String colorId;
     private String sizeId;
-    private BigDecimal price;
+    private double price;
     private int saleQuantity;
     private boolean isStock;
 }

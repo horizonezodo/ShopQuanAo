@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.horizonezodo.core.Entity.User;
 import vn.horizonezodo.core.Entity.Wallet;
+import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.Input.WalletInput;
 import vn.horizonezodo.core.Output.Message;
 import vn.horizonezodo.core.Repo.WalletRepo;
@@ -20,11 +21,24 @@ public class WalletService {
     private UserService service;
 
     @Transactional
-    public Message addCashToWallet(WalletInput walletInput){
+    public void addCashToWallet(WalletInput walletInput){
         User user = service.getUserById(walletInput.getUserId()).get();
         Wallet wallet = user.getWallet();
         wallet.setAmount(walletInput.getPrice());
         repo.save(wallet);
-        return new Message("Nạp tiền thành cồng");
+    }
+
+    public void lockWallet(Long id){
+        User user = service.getUserById(id).orElseThrow(()-> new MessageException("Không tìm thấy user theo id: " + id));
+        Wallet wallet = user.getWallet();
+        wallet.setLockWallet(true);
+        repo.save(wallet);
+    }
+
+    public void unlockWallet(Long id){
+        User user = service.getUserById(id).orElseThrow(()-> new MessageException("Không tìm thấy user theo id: " + id));
+        Wallet wallet = user.getWallet();
+        wallet.setLockWallet(false);
+        repo.save(wallet);
     }
 }

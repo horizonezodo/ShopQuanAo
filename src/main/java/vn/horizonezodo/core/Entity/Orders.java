@@ -18,7 +18,7 @@ public class Orders {
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
     private long orderDate;
-    private BigDecimal totalPrice;
+    private double totalPrice;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

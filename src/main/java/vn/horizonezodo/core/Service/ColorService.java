@@ -27,16 +27,15 @@ public class ColorService {
         return color;
     }
 
-    public Message updateColor(ColorInput input,String id){
+    public Color updateColor(ColorInput input,String id){
         Color color = findById(id);
         color.setName(input.getName());
         color.setImg(input.getImg());
-        repo.save(color);
-        return new Message("Update color thành công");
+        color = repo.save(color);
+        return color;
     }
 
-    public void deleteColor(String id){
-        Color color = findById(id);
+    public void deleteColor(Color color){
         repo.delete(color);
     }
 

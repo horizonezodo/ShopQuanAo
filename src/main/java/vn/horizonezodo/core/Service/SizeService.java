@@ -26,16 +26,15 @@ public class SizeService {
         return size;
     }
 
-    public Message updateSize(SizeInput input, String id){
+    public Size updateSize(SizeInput input, String id){
         Size size = getSizeById(id);
         size.setName(input.getName());
         size.setDescription(input.getDescription());
-        repo.save(size);
-        return new Message("Update size thành công");
+        size = repo.save(size);
+        return size;
     }
 
-    public void deleteSize(String id){
-        Size size = getSizeById(id);
+    public void deleteSize(Size size){
         repo.delete(size);
     }
 

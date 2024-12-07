@@ -2,15 +2,18 @@ package vn.horizonezodo.core.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import vn.horizonezodo.core.Entity.OrderHistory;
-import vn.horizonezodo.core.Entity.PAYMENTTYPE;
-import vn.horizonezodo.core.Entity.User;
-import vn.horizonezodo.core.Entity.Wallet;
+import vn.horizonezodo.core.Entity.*;
+import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.MongoRepo.OrderHistoryRepo;
 import vn.horizonezodo.core.Output.Message;
 import vn.horizonezodo.core.Input.OrderHistoryInput;
+import vn.horizonezodo.core.Output.OrderHistoryOutput;
+import vn.horizonezodo.core.Output.OrderItemOutput;
+import vn.horizonezodo.core.Repo.OrderItemRepo;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OrderHistoryService {
@@ -21,8 +24,17 @@ public class OrderHistoryService {
     @Autowired
     private OrderHistoryRepo repo;
 
+    @Autowired
+    private OrderItemRepo itemRepo;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private VariantService variantService;
+
     @Transactional
-    public Message addHistory(OrderHistoryInput input){
+    public void addHistory(OrderHistoryInput input){
         User user = userService.getUserById(input.getUserId()).get();
         Wallet wallet = user.getWallet();
         OrderHistory history = new OrderHistory();
@@ -41,7 +53,57 @@ public class OrderHistoryService {
         }
         history.setWalletId(wallet.getId());
         history.setUserId(user.getId());
+        history.setPaymentAmount(input.getPaymentAmount());
         repo.save(history);
-        return new Message("Add history success");
+    }
+
+    public List<OrderHistoryOutput> getAllOrderHistoryByUser(Long userId){
+        List<OrderHistory> orderHistories = repo.findAllByUserId(userId);
+        List<OrderHistoryOutput> outputs = new ArrayList<>();
+        for (OrderHistory orderHistory: orderHistories){
+            OrderHistoryOutput out = new OrderHistoryOutput();
+            out.setId(orderHistory.getId());
+            out.setDayPayment(orderHistory.getDayPayment());
+            out.setPaymenttype(orderHistory.getPaymenttype());
+            out.setPaymentAmount(orderHistory.getPaymentAmount());
+            List<OrderItem> orderItems = itemRepo.findAllByOrder(orderHistory.getOrderId());
+            List<OrderItemOutput> ouputs = new ArrayList<>();
+            for(OrderItem oder: orderItems){
+                OrderItemOutput o = new OrderItemOutput();
+                o.setId(oder.getId());
+                o.setProduct(productService.getProductOutput(oder.getProductId()));
+                o.setVariant(variantService.getById(oder.getVariantId()));
+                o.setPrice(oder.getPrice());
+                o.setQuantity(oder.getQuantity());
+                o.setTotalPrice(oder.getTotalPrice());
+                ouputs.add(o);
+            }
+            out.setOrderItemOutput(ouputs);
+            outputs.add(out);
+        }
+        return outputs;
+    }
+
+    public OrderHistoryOutput getOrderHistoryById(String id){
+        OrderHistory history = repo.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy order history theo id: " + id));
+        OrderHistoryOutput out = new OrderHistoryOutput();
+        out.setId(history.getId());
+        out.setDayPayment(history.getDayPayment());
+        out.setPaymenttype(history.getPaymenttype());
+        out.setPaymentAmount(history.getPaymentAmount());
+        List<OrderItem> orderItems = itemRepo.findAllByOrder(history.getOrderId());
+        List<OrderItemOutput> ouputs = new ArrayList<>();
+        for(OrderItem oder: orderItems){
+            OrderItemOutput o = new OrderItemOutput();
+            o.setId(oder.getId());
+            o.setProduct(productService.getProductOutput(oder.getProductId()));
+            o.setVariant(variantService.getById(oder.getVariantId()));
+            o.setPrice(oder.getPrice());
+            o.setQuantity(oder.getQuantity());
+            o.setTotalPrice(oder.getTotalPrice());
+            ouputs.add(o);
+        }
+        out.setOrderItemOutput(ouputs);
+        return out;
     }
 }

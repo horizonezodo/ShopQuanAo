@@ -36,7 +36,13 @@ public class VariantService {
         return repo.findAllByProductId(id);
     }
 
-    public Message addVariant(VariantInput input){
+    public void addAllVariant(List<VariantInput> variantInputs){
+        for (VariantInput input: variantInputs){
+            addVariant(input);
+        }
+    }
+
+    public void addVariant(VariantInput input){
         ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg());
         Color color = colorService.addColor(colorInput);
         SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes());
@@ -49,10 +55,13 @@ public class VariantService {
         variant.setStock(input.isStock());
         variant.setSaleQuantity(input.getSaleQuantity());
         repo.save(variant);
-        return new Message("thêm variant thành công");
     }
 
     public Message updateVariant(VariantInput input){
+        ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg());
+        Color color = colorService.updateColor(colorInput,input.getColorId());
+        SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes());
+        Size size = sizeService.updateSize(sizeInput, input.getSizeId());
         Variant variant = getById(input.getId());
         variant.setSaleQuantity(input.getSaleQuantity());
         variant.setStock(input.isStock());
@@ -61,10 +70,12 @@ public class VariantService {
         return new Message("Update variant thành công");
     }
 
-    public Message deleteVariant(VariantInput input){
-        Variant variant = getById(input.getId());
-        colorService.deleteColor(input.getColorId());
-        sizeService.deleteSize(input.getSizeId());
+    public Message deleteVariant(String id){
+        Variant variant = getById(id);
+        Color color = colorService.findById(variant.getColorId());
+        colorService.deleteColor(color);
+        Size size = sizeService.getSizeById(variant.getSizeId());
+        sizeService.deleteSize(size);
         repo.delete(variant);
         return new Message("Delete variant thành công");
     }

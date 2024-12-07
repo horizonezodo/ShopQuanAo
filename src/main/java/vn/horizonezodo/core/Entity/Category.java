@@ -17,5 +17,7 @@ public class Category {
     private String cateName;
     private long createAt;
     private long updateAt;
+    private int level;
+    private boolean isActivate;
     private List<String> childIds;
 }

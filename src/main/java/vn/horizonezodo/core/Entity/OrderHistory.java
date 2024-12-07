@@ -21,4 +21,5 @@ public class OrderHistory {
     private long dayPayment;
     @Enumerated(EnumType.STRING)
     private PAYMENTTYPE paymenttype;
+    private double paymentAmount;
 }

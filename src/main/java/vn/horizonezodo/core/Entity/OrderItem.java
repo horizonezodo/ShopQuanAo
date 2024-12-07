@@ -15,8 +15,10 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String productId;
+    private String variantId;
     private int quantity;
-    private BigDecimal price;
+    private double price;
+    private double totalPrice;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId", referencedColumnName = "id", nullable = false)
     private Orders order;

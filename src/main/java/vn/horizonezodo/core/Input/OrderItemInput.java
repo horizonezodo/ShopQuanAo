@@ -9,16 +9,11 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class OrderInput {
+@AllArgsConstructor
+public class OrderItemInput {
     private Long orderId;
-    private Long userId;
-    private String productId;
-    private String variantId;
+    private Long orderItemId;
     private int quantity;
     private BigDecimal price;
-    private String shipingAddress;
-    private String note;
-    private String orderStatus;
 }
