@@ -44,7 +44,8 @@ public class OrderService {
 
     @Transactional
     public Message AddProductToOrder(OrderInput input){
-        Optional<Orders> orderOpt = repo.findByUserAndOrderstatus(input.getUserId(), ORDERSTATUS.OPEN);
+        User userFind = service.getUserById(Long.parseLong(input.getUserId())).orElseThrow(() -> new MessageException("Không tìm thấy user theo id: "+ input.getUserId()));
+        Optional<Orders> orderOpt = repo.findByUserAndOrderstatus(userFind, ORDERSTATUS.OPEN);
         ProductOutput product = productService.getProductOutput(input.getProductId());
         Variant variant = variantService.getById(input.getVariantId());
         if(orderOpt.isPresent()){
@@ -75,8 +76,9 @@ public class OrderService {
         }else{
             Orders orders = new Orders();
             orders.setCreateAt(System.currentTimeMillis());
-            User user = service.getUserById(input.getUserId()).orElseThrow(() -> new MessageException("Lỗi không tìm thấy user"));
+            User user = service.getUserById(Long.parseLong(input.getUserId())).orElseThrow(() -> new MessageException("Lỗi không tìm thấy user"));
             orders.setUser(user);
+            repo.save(orders);
             List<OrderItem> orderItems = new ArrayList<>();
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(orders);
@@ -167,7 +169,8 @@ public class OrderService {
 
     public Page<OrderOutput> getAllOrderByUserId(OrderInput input, int pageSize, int page){
         Pageable pageable = PageRequest.of(page,pageSize);
-        Page<Orders> orders = repo.findAllByUserAndOrderstatus(input.getUserId(), ORDERSTATUS.OPEN, pageable);
+        User user = service.getUserById(Long.parseLong(input.getUserId())).orElseThrow(() -> new MessageException("Không tìm thấy user theo id: "+ input.getUserId()));
+        Page<Orders> orders = repo.findAllByUserAndOrderstatus(user, ORDERSTATUS.OPEN, pageable);
         List<OrderOutput> orderOutputs = orders.stream()
                 .map(o -> {
                     OrderOutput orderOutput = new OrderOutput();

@@ -20,6 +20,7 @@ public class ProductOutput {
     private String thumbImg;
     private List<String> listImage;
     private int viewCount;
-    private boolean isTop;
+    private boolean activate;
+    private boolean top;
     private List<Variant> listVariants;
 }

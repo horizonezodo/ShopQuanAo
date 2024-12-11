@@ -14,7 +14,6 @@ import vn.horizonezodo.core.Repo.UserRepo;
 import vn.horizonezodo.core.Repo.WalletRepo;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -47,7 +46,7 @@ public class UserService {
     @Transactional
     public UserOutput saveUser(UserInput input){
         Wallet wallet = new Wallet();
-        wallet.setAmount(BigDecimal.ZERO);
+        wallet.setAmount(0);
         wallet.setLockWallet(false);
         walletRepo.save(wallet);
 
@@ -59,7 +58,8 @@ public class UserService {
         user.setRole(role);
         user.setWallet(wallet);
         user.setDayCreate(System.currentTimeMillis());
-        user.setLock(true);
+        user.setLock(false);
+        user.setActivate(false);
         repo.save(user);
         UserOutput userOutput = new UserOutput(user.getUsername(),user.getEmail());
         return userOutput;

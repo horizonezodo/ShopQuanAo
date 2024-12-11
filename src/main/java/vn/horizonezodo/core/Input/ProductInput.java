@@ -21,9 +21,9 @@ public class ProductInput {
     private String thumbImg;
     private List<String> listImg;
     private int saleCount;
-    private boolean isTop;
+    private boolean top;
     private String categoryId;
-    private boolean isActivate;
+    private boolean activate;
     private String id;
     private String colorName;
     private String colorImg;

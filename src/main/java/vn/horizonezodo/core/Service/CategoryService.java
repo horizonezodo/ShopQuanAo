@@ -22,8 +22,11 @@ public class CategoryService {
 
     public void addChildCategory(CategoryInput input){
         Category parentCate = categoryRepo.findById(input.getParentId()).orElseThrow(() -> new MessageException("Không tìm thấy danh mục cha"));
-        parentCate.setChildIds(input.getListChildId());
+        List<String> listChildsDiff = input.getListChildId();
+        listChildsDiff.removeAll(parentCate.getChildIds());
+        parentCate.getChildIds().addAll(listChildsDiff);
         parentCate.setUpdateAt(System.currentTimeMillis());
+        parentCate.setActivate(input.isActivate());
         categoryRepo.save(parentCate);
     }
 
@@ -80,6 +83,10 @@ public class CategoryService {
         return cateOutputs;
     }
 
+    public List<Category> findAll(){
+        return categoryRepo.findAll();
+    }
+
     public CateOutput getCate(String id){
         Category cate = categoryRepo.findById(id).orElseThrow(()-> new MessageException("Không tìm thấy cate theo id: " + id));
         CateOutput cateOutput = new CateOutput();
@@ -90,6 +97,12 @@ public class CategoryService {
         cateOutput.setUpdateAt(cate.getUpdateAt());
         cateOutput.setChildCates(categoryRepo.findAllById(id));
         return cateOutput;
+    }
+
+    public void ActivateCate(String id){
+        Category category = categoryRepo.findById(id).orElseThrow(()-> new MessageException("Không tìm thấy cate theo id: " + id));
+        category.setActivate(true);
+        categoryRepo.save(category);
     }
 
 }

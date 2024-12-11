@@ -10,6 +10,7 @@ import vn.horizonezodo.core.Entity.Product;
 import vn.horizonezodo.core.Entity.Variant;
 import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.Input.ProductInput;
+import vn.horizonezodo.core.Input.VariantInput;
 import vn.horizonezodo.core.MongoRepo.ProductRepo;
 import vn.horizonezodo.core.Output.Message;
 import vn.horizonezodo.core.Output.ProductOutput;
@@ -27,19 +28,21 @@ public class ProductService {
     private VariantService service;
 
     public Page<ProductOutput> getAllProduct(String cateId, int pageSize, int page){
+        List<Product> pro = repo.findAllByCategoryId(cateId);
         Pageable pageable = PageRequest.of(page,pageSize);
         Page<Product> productPage = repo.findAllByCategoryId(cateId, pageable);
         List<ProductOutput> productOutputs = productPage.stream()
             .map(p -> {
             ProductOutput productOutput = new ProductOutput();
-            productOutput.setId(p.getProductId());
+            productOutput.setId(p.getId());
             productOutput.setProductName(p.getProductName());
             productOutput.setCreateAt(p.getUpdateAt());
             productOutput.setListImage(p.getListImg());
             productOutput.setThumbImg(p.getThumbImg());
-            List<Variant> variants = service.getListVariant(p.getProductId());
+            List<Variant> variants = service.getListVariant(p.getId());
             productOutput.setListVariants(variants);
             productOutput.setTop(p.isTop());
+            productOutput.setActivate(p.isActivate());
             productOutput.setViewCount(p.getViewCount());
             return productOutput;
         }).collect(Collectors.toList());
@@ -59,6 +62,7 @@ public class ProductService {
         productOutput.setListVariants(variants);
         productOutput.setViewCount(product.getViewCount());
         productOutput.setTop(product.isTop());
+        productOutput.setActivate(product.isActivate());
         return productOutput;
     }
 
@@ -117,12 +121,12 @@ public class ProductService {
         List<ProductOutput> productOutputs = productPage.stream()
                 .map(p -> {
                     ProductOutput productOutput = new ProductOutput();
-                    productOutput.setId(p.getProductId());
+                    productOutput.setId(p.getId());
                     productOutput.setProductName(p.getProductName());
                     productOutput.setCreateAt(p.getUpdateAt());
                     productOutput.setListImage(p.getListImg());
                     productOutput.setThumbImg(p.getThumbImg());
-                    List<Variant> variants = service.getListVariant(p.getProductId());
+                    List<Variant> variants = service.getListVariant(p.getId());
                     productOutput.setListVariants(variants);
                     productOutput.setTop(p.isTop());
                     productOutput.setViewCount(p.getViewCount());
@@ -130,6 +134,14 @@ public class ProductService {
                 }).collect(Collectors.toList());
 
         return new PageImpl<>(productOutputs, pageable, productPage.getTotalElements());
+    }
+
+    public void addListVariant(List<VariantInput> variantInputs, String id){
+        Product product = repo.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy product theo id: " + id));
+        for (VariantInput variantInput: variantInputs){
+            variantInput.setProductId(product.getId());
+            service.addVariant(variantInput);
+        }
     }
 
 

@@ -12,6 +12,8 @@ import vn.horizonezodo.core.Output.ProductOutput;
 import vn.horizonezodo.core.Service.ProductService;
 import vn.horizonezodo.core.Service.VariantService;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/service")
@@ -24,7 +26,7 @@ public class ProductController {
     private VariantService variantService;
 
     @GetMapping("/product/get-all/{cateId}")
-    public ResponseEntity<?> getAllProduct(@RequestParam String cateId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size){
+    public ResponseEntity<?> getAllProduct(@PathVariable String cateId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size){
         Page<ProductOutput> productOutputList = productService.getAllProduct(cateId, size, page);
         return new ResponseEntity<>(productOutputList, HttpStatus.OK);
     }
@@ -87,4 +89,11 @@ public class ProductController {
         variantService.deleteVariant(id);
         return new ResponseEntity<>(new Message("Delete variant thành công"), HttpStatus.OK);
     }
+
+    @PostMapping("/product/add-list-variant/{id}")
+    public ResponseEntity<?> addListVariant(@PathVariable("id")String id,@RequestBody List<VariantInput> inputs){
+        productService.addListVariant(inputs, id);
+        return new ResponseEntity<>(new Message("Thêm thuộc tính sản phẩm thành công"), HttpStatus.OK);
+    }
+
  }

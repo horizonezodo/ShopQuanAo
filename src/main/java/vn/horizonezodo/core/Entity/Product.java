@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class Product {
     @Id
-    private String productId;
+    private String id;
     private String productName;
     private String productDescription;
     private long createAt;

@@ -79,4 +79,10 @@ public class VariantService {
         repo.delete(variant);
         return new Message("Delete variant thành công");
     }
+
+    public void activateVariant(String id){
+        Variant variant = getById(id);
+        variant.setStock(true);
+        repo.save(variant);
+    }
 }

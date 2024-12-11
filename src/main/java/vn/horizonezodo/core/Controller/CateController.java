@@ -53,10 +53,21 @@ public class CateController {
         return new ResponseEntity<>(cateOutputList, HttpStatus.OK);
     }
 
+    @GetMapping("/find-all")
+    public ResponseEntity<?> findAll(){
+        return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
+    }
+
     @GetMapping("/get-cate/{id}")
     public ResponseEntity<?> getCate(@PathVariable("id")String id){
         CateOutput cateOutput = categoryService.getCate(id);
         return new ResponseEntity<>(cateOutput, HttpStatus.OK);
+    }
+
+    @PostMapping("/activate-cate/{id}")
+    public ResponseEntity<?> activateCate(@PathVariable("id")String id){
+        categoryService.ActivateCate(id);
+        return new ResponseEntity<>(new Message("Activate cate thành công"), HttpStatus.OK);
     }
 
 }

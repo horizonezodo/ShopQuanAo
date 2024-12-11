@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderInput {
-    private Long orderId;
-    private Long userId;
+    private String orderId;
+    private String userId;
     private String productId;
     private String variantId;
     private int quantity;

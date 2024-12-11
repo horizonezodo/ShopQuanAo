@@ -12,4 +12,5 @@ import java.util.List;
 public interface ProductRepo extends MongoRepository<Product, String> {
     Page<Product> findAllByCategoryId(String cateId, Pageable pageable);
     Page<Product> findAllByTop(boolean isTop, Pageable pageable);
+    List<Product> findAllByCategoryId(String cateId);
 }

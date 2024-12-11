@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -21,6 +20,16 @@ public class VariantInput {
     private String sizeId;
     private double price;
     private int saleQuantity;
-    private boolean isStock;
+    private boolean stock;
     private String colorId;
+
+    public VariantInput(String colorName, String colorImg, String sizeName, String sizeDes, double price, int saleQuantity, boolean stock) {
+        this.colorName = colorName;
+        this.colorImg = colorImg;
+        this.sizeName = sizeName;
+        this.sizeDes = sizeDes;
+        this.price = price;
+        this.saleQuantity = saleQuantity;
+        this.stock = stock;
+    }
 }

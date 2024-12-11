@@ -18,6 +18,6 @@ public class Category {
     private long createAt;
     private long updateAt;
     private int level;
-    private boolean isActivate;
+    private boolean activate;
     private List<String> childIds;
 }

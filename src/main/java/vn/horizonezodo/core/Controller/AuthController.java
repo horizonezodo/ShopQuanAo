@@ -66,7 +66,11 @@ public class AuthController {
                 ResponseCookie jwtCookie = until.generateJwtCookie(userDetail);
                 RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetail.getId());
                 ResponseCookie jwtRefreshCookie = until.generateRefreshJwtCookie(refreshToken.getToken());
-                return new ResponseEntity<>(new Message("Đăng nhập thành công"), HttpStatus.OK);
+                //return new ResponseEntity<>(new Message("Đăng nhập thành công"), HttpStatus.OK);
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                        .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())// Gửi cookie trong header
+                        .body("Đăng nhập thành công");
             }
         }
         else{
