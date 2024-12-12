@@ -8,6 +8,8 @@ import vn.horizonezodo.core.Input.ColorInput;
 import vn.horizonezodo.core.MongoRepo.ColorRepo;
 import vn.horizonezodo.core.Output.Message;
 
+import java.util.List;
+
 @Service
 public class ColorService {
 
@@ -18,6 +20,7 @@ public class ColorService {
         Color color = new Color();
         color.setName(input.getName());
         color.setImg(input.getImg());
+        color.setProductId(input.getProductId());
         color = repo.save(color);
         return color;
     }
@@ -37,6 +40,10 @@ public class ColorService {
 
     public void deleteColor(Color color){
         repo.delete(color);
+    }
+
+    public List<Color> getAllByProductId(String productId){
+        return repo.findAllByProductId(productId);
     }
 
 

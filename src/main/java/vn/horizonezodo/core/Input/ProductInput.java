@@ -24,14 +24,5 @@ public class ProductInput {
     private boolean top;
     private String categoryId;
     private boolean activate;
-    private String id;
-    private String colorName;
-    private String colorImg;
-    private String sizeName;
-    private String sizeDes;
-    private String sizeId;
-    private double price;
-    private int saleQuantity;
-    private boolean isStock;
-    private String colorId;
+    private List<VariantInput> variantInputs;
 }

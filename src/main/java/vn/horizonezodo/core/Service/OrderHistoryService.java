@@ -9,7 +9,9 @@ import vn.horizonezodo.core.Output.Message;
 import vn.horizonezodo.core.Input.OrderHistoryInput;
 import vn.horizonezodo.core.Output.OrderHistoryOutput;
 import vn.horizonezodo.core.Output.OrderItemOutput;
+import vn.horizonezodo.core.Output.OrderOutput;
 import vn.horizonezodo.core.Repo.OrderItemRepo;
+import vn.horizonezodo.core.Repo.OrderRepo;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ public class OrderHistoryService {
 
     @Autowired
     private VariantService variantService;
+
+    @Autowired
+    private OrderRepo orderRepo;
 
     @Transactional
     public void addHistory(OrderHistoryInput input){
@@ -66,7 +71,8 @@ public class OrderHistoryService {
             out.setDayPayment(orderHistory.getDayPayment());
             out.setPaymenttype(orderHistory.getPaymenttype());
             out.setPaymentAmount(orderHistory.getPaymentAmount());
-            List<OrderItem> orderItems = itemRepo.findAllByOrder(orderHistory.getOrderId());
+            Orders orders = orderRepo.findById(orderHistory.getOrderId()).orElseThrow(()-> new MessageException("Không tìm thấy order theo id" + orderHistory.getOrderId()));
+            List<OrderItem> orderItems = itemRepo.findAllByOrder(orders);
             List<OrderItemOutput> ouputs = new ArrayList<>();
             for(OrderItem oder: orderItems){
                 OrderItemOutput o = new OrderItemOutput();
@@ -91,7 +97,8 @@ public class OrderHistoryService {
         out.setDayPayment(history.getDayPayment());
         out.setPaymenttype(history.getPaymenttype());
         out.setPaymentAmount(history.getPaymentAmount());
-        List<OrderItem> orderItems = itemRepo.findAllByOrder(history.getOrderId());
+        Orders orders = orderRepo.findById(history.getOrderId()).orElseThrow(()-> new MessageException("Không tìm thấy order theo id" + history.getOrderId()));
+        List<OrderItem> orderItems = itemRepo.findAllByOrder(orders);
         List<OrderItemOutput> ouputs = new ArrayList<>();
         for(OrderItem oder: orderItems){
             OrderItemOutput o = new OrderItemOutput();

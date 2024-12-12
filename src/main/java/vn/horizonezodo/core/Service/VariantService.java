@@ -36,31 +36,31 @@ public class VariantService {
         return repo.findAllByProductId(id);
     }
 
-    public void addAllVariant(List<VariantInput> variantInputs){
+    public void addAllVariant(List<VariantInput> variantInputs,String productId){
         for (VariantInput input: variantInputs){
-            addVariant(input);
+            addVariant(input, productId);
         }
     }
 
-    public void addVariant(VariantInput input){
-        ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg());
-        Color color = colorService.addColor(colorInput);
-        SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes());
-        Size size = sizeService.addSize(sizeInput);
+    public void addVariant(VariantInput input,String productId){
         Variant variant = new Variant();
-        variant.setColorId(color.getId());
-        variant.setProductId(input.getProductId());
-        variant.setSizeId(size.getId());
+        variant.setProductId(productId);
         variant.setPrice(input.getPrice());
         variant.setStock(input.isStock());
         variant.setSaleQuantity(input.getSaleQuantity());
+        ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg(),productId);
+        Color color = colorService.addColor(colorInput);
+        SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes(),productId);
+        Size size = sizeService.addSize(sizeInput);
+        variant.setSizeId(size.getId());
+        variant.setColorId(color.getId());
         repo.save(variant);
     }
 
     public Message updateVariant(VariantInput input){
-        ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg());
+        ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg(),input.getProductId());
         Color color = colorService.updateColor(colorInput,input.getColorId());
-        SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes());
+        SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes(), input.getProductId());
         Size size = sizeService.updateSize(sizeInput, input.getSizeId());
         Variant variant = getById(input.getId());
         variant.setSaleQuantity(input.getSaleQuantity());

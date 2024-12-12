@@ -17,10 +17,7 @@ import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.Input.UserInput;
 import vn.horizonezodo.core.Jwt.JwtUntil;
 import vn.horizonezodo.core.Output.Message;
-import vn.horizonezodo.core.Service.MailService;
-import vn.horizonezodo.core.Service.RefreshTokenService;
-import vn.horizonezodo.core.Service.UserDetailImpl;
-import vn.horizonezodo.core.Service.UserService;
+import vn.horizonezodo.core.Service.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,16 +47,22 @@ public class AuthController {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private LogAPIService logAPIService;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserInput input){
+        long beginTime = System.currentTimeMillis();
         Optional<User> user = service.getUserByInfo(input.getEmail());
         if(user.isPresent()){
             if(user.get().isLock()){
+
                 return new ResponseEntity<>( new Message("Tài khoản của bạn đã bị khóa, mời contact với nhân viên để mở khóa"), HttpStatus.BAD_REQUEST);
             }else if(!user.get().isActivate()){
                 return new ResponseEntity<>(new Message("Tài khoản của bạn chưa activate"), HttpStatus.BAD_REQUEST);
             }
             else{
+
                 Authentication authentication = manager.authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 UserDetailImpl userDetail = (UserDetailImpl) authentication.getPrincipal();
@@ -98,7 +101,11 @@ public class AuthController {
         }
         ResponseCookie jwtCookie = until.getCleanJwtCookie();
         ResponseCookie jwtRefreshCookie = until.getCleanJwtRefreshCookie();
-        return new ResponseEntity<>(new Message("Logout thành công"), HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .body(new Message("Logout thành công"));
+
     }
 
     @PostMapping("/refresh-token")
@@ -110,9 +117,11 @@ public class AuthController {
                     .map(RefreshToken::getUser)
                     .map(user -> {
                         ResponseCookie jwtCookie = until.generateJwtCookie(user);
-
+                        RefreshToken refToken = refreshTokenService.updateRefreshToken(refreshToken);
+                        ResponseCookie jwtRefreshCookie = until.generateRefreshJwtCookie(refToken.getToken());
                         return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                                 .body(new Message("Token is refreshed successfully!"));
                     })
                     .orElseThrow(() -> new MessageException("Refresh token is not in database!"));

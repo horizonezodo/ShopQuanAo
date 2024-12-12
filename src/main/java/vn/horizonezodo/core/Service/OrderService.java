@@ -51,7 +51,7 @@ public class OrderService {
         if(orderOpt.isPresent()){
             Orders order = orderOpt.get();
             List<OrderItem> orderItemList = order.getOrderItems();
-            Optional<OrderItem> orderItemOpt = itemRepo.findByOrOrderAndProductId(order.getId(), input.getProductId());
+            Optional<OrderItem> orderItemOpt = itemRepo.findByOrOrderAndProductId(order, input.getProductId());
             if(orderItemOpt.isPresent()){
                 OrderItem orderItem = orderItemOpt.get();
                 orderItem.setQuantity(orderItem.getQuantity() + input.getQuantity());
@@ -180,7 +180,8 @@ public class OrderService {
                     orderOutput.setOrderstatus(o.getOrderstatus());
                     orderOutput.setTotalPrice(o.getTotalPrice());
                     orderOutput.setShippingAddress(o.getShippingAddress());
-                    List<OrderItem> orderItems = itemRepo.findAllByOrder(o.getId());
+                    Orders order = repo.findById(o.getId()).orElseThrow(()-> new MessageException("Không tìm thấy order theo id: " +  o.getId()));
+                    List<OrderItem> orderItems = itemRepo.findAllByOrder(order);
                     List<OrderItemOutput> ouputs = new ArrayList<>();
                     for(OrderItem oder: orderItems){
                         OrderItemOutput out = new OrderItemOutput();
@@ -195,6 +196,7 @@ public class OrderService {
                     orderOutput.setOrderItemList(ouputs);
                     return orderOutput;
                 }).collect(Collectors.toList());
+        System.out.println(orderOutputs.toString());
         return new PageImpl<>(orderOutputs, pageable, orders.getTotalElements());
     }
 
@@ -206,7 +208,7 @@ public class OrderService {
         orderOutput.setUserNote(order.getUserNote());
         orderOutput.setTotalPrice(order.getTotalPrice());
         orderOutput.setShippingAddress(order.getShippingAddress());
-        List<OrderItem> orderItems = itemRepo.findAllByOrder(id);
+        List<OrderItem> orderItems = itemRepo.findAllByOrder(order);
         List<OrderItemOutput> outputs = new ArrayList<>();
         for(OrderItem o: orderItems){
             OrderItemOutput ouput = new OrderItemOutput();
@@ -238,8 +240,13 @@ public class OrderService {
         orderItem.setQuantity(input.getQuantity());
         orderItem.setTotalPrice(orderItem.getTotalPrice() * input.getQuantity());
         itemRepo.save(orderItem);
-        Orders orders = repo.findById(input.getOrderId()).orElseThrow(()-> new MessageException("Không thể tìm thấy order theo id: " + input.getOrderId()));
-        orders.setTotalPrice(updateTotalPrice(orders));
-        repo.save(orders);
+        Optional<Orders> ordersOpt = repo.findById(input.getOrderId());
+        if(ordersOpt.isPresent()) {
+            Orders orders = ordersOpt.get();
+            orders.setTotalPrice(updateTotalPrice(orders));
+            repo.save(orders);
+        }else{
+            throw new MessageException("Không thể tìm thấy order theo id: " + input.getOrderId());
+        }
     }
 }

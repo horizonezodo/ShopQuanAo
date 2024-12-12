@@ -13,4 +13,5 @@ import lombok.Setter;
 public class SizeInput {
     private String name;
     private String description;
+    private String productId;
 }

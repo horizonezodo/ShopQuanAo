@@ -6,7 +6,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import vn.horizonezodo.core.Entity.Color;
 import vn.horizonezodo.core.Entity.Product;
+import vn.horizonezodo.core.Entity.Size;
 import vn.horizonezodo.core.Entity.Variant;
 import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.Input.ProductInput;
@@ -15,7 +17,6 @@ import vn.horizonezodo.core.MongoRepo.ProductRepo;
 import vn.horizonezodo.core.Output.Message;
 import vn.horizonezodo.core.Output.ProductOutput;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,12 @@ public class ProductService {
 
     @Autowired
     private VariantService service;
+
+    @Autowired
+    private ColorService colorService;
+
+    @Autowired
+    private SizeService sizeService;
 
     public Page<ProductOutput> getAllProduct(String cateId, int pageSize, int page){
         List<Product> pro = repo.findAllByCategoryId(cateId);
@@ -53,6 +60,8 @@ public class ProductService {
     public ProductOutput getProductOutput(String id){
         Product product = repo.findById(id).orElseThrow(()-> new MessageException("Không tìm thấy product theo id: "+id));
         List<Variant> variants = service.getListVariant(id);
+        List<Color> colors = colorService.getAllByProductId(id);
+        List<Size> sizes = sizeService.getAllByProductId(id);
         ProductOutput productOutput = new ProductOutput();
         productOutput.setId(id);
         productOutput.setProductName(product.getProductName());
@@ -60,6 +69,8 @@ public class ProductService {
         productOutput.setThumbImg(product.getThumbImg());
         productOutput.setListImage(product.getListImg());
         productOutput.setListVariants(variants);
+        productOutput.setColors(colors);
+        productOutput.setSizes(sizes);
         productOutput.setViewCount(product.getViewCount());
         productOutput.setTop(product.isTop());
         productOutput.setActivate(product.isActivate());
@@ -77,6 +88,7 @@ public class ProductService {
         product.setListImg(input.getListImg());
         product.setActivate(input.isActivate());
         repo.save(product);
+        service.addAllVariant(input.getVariantInputs(), product.getId());
         return new Message("Thêm sản phẩm thành công");
     }
 
@@ -136,13 +148,8 @@ public class ProductService {
         return new PageImpl<>(productOutputs, pageable, productPage.getTotalElements());
     }
 
-    public void addListVariant(List<VariantInput> variantInputs, String id){
+    public void addListVariant(List<VariantInput> variantInputs, String id) {
         Product product = repo.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy product theo id: " + id));
-        for (VariantInput variantInput: variantInputs){
-            variantInput.setProductId(product.getId());
-            service.addVariant(variantInput);
-        }
+        service.addAllVariant(variantInputs, id);
     }
-
-
 }

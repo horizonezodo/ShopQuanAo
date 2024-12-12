@@ -68,19 +68,8 @@ public class ProductController {
     }
 
     @PostMapping("/product/update-variant/{id}")
-    public ResponseEntity<?> updateVariant(@PathVariable("id")String id, ProductInput input){
-        VariantInput variantInput = new VariantInput();
-        variantInput.setColorId(input.getColorId());
-        variantInput.setId(id);
-        variantInput.setColorImg(input.getColorImg());
-        variantInput.setColorName(input.getColorName());
-        variantInput.setPrice(input.getPrice());
-        variantInput.setSizeId(input.getSizeId());
-        variantInput.setSaleQuantity(input.getSaleQuantity());
-        variantInput.setSizeName(input.getSizeName());
-        variantInput.setSizeDes(input.getSizeDes());
-        variantInput.setStock(input.isStock());
-        variantService.updateVariant(variantInput);
+    public ResponseEntity<?> updateVariant(@PathVariable("id")String id, VariantInput input){
+        variantService.updateVariant(input);
         return new ResponseEntity<>(new Message("Update variant thành công"), HttpStatus.OK);
     }
 

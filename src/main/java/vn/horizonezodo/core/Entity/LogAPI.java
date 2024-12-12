@@ -8,15 +8,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 
-@Document(collection = "sizes")
+
+@Document
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Size {
+public class LogAPI {
     @Id
     private String id;
-    private String name;
-    private String description;
-    private String productId;
+    private LogAPIType type;
+    private String url;
+    private String request;
+    private String response;
+    private long beginTime;
+    private long endTime;
 }

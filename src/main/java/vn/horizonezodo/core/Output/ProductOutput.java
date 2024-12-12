@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.horizonezodo.core.Entity.Color;
+import vn.horizonezodo.core.Entity.Size;
 import vn.horizonezodo.core.Entity.Variant;
 
 import java.util.List;
@@ -22,5 +24,7 @@ public class ProductOutput {
     private int viewCount;
     private boolean activate;
     private boolean top;
+    private List<Color> colors;
+    private List<Size> sizes;
     private List<Variant> listVariants;
 }
