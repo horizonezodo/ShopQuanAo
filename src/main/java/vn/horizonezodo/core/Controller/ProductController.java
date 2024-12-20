@@ -5,7 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.horizonezodo.core.Entity.Variant;
 import vn.horizonezodo.core.Input.ProductInput;
+import vn.horizonezodo.core.Input.SearchProduct;
 import vn.horizonezodo.core.Input.VariantInput;
 import vn.horizonezodo.core.Output.Message;
 import vn.horizonezodo.core.Output.ProductOutput;
@@ -69,13 +71,16 @@ public class ProductController {
 
     @PostMapping("/product/update-variant/{id}")
     public ResponseEntity<?> updateVariant(@PathVariable("id")String id, VariantInput input){
-        variantService.updateVariant(input);
+        variantService.updateVariant(input, id);
+        productService.updateProductPrice(input.getProductId());
         return new ResponseEntity<>(new Message("Update variant thành công"), HttpStatus.OK);
     }
 
     @PostMapping("/product/delete-variant/{id}")
     public ResponseEntity<?> deleteVariant(@PathVariable("id")String id){
+        Variant variant = variantService.getById(id);
         variantService.deleteVariant(id);
+        productService.updateProductPrice(variant.getProductId());
         return new ResponseEntity<>(new Message("Delete variant thành công"), HttpStatus.OK);
     }
 
@@ -83,6 +88,16 @@ public class ProductController {
     public ResponseEntity<?> addListVariant(@PathVariable("id")String id,@RequestBody List<VariantInput> inputs){
         productService.addListVariant(inputs, id);
         return new ResponseEntity<>(new Message("Thêm thuộc tính sản phẩm thành công"), HttpStatus.OK);
+    }
+
+    @PostMapping("/product/search-product-for-user")
+    public ResponseEntity<?> searchProductForUser(@RequestBody SearchProduct searchProduct){
+        return new ResponseEntity<>(productService.searchProductForUser(searchProduct), HttpStatus.OK);
+    }
+
+    @PostMapping("/product/search-product-for-admin")
+    public ResponseEntity<?> searchProductForAdmin(@RequestBody SearchProduct searchProduct){
+        return new ResponseEntity<>(productService.searchProductForAdmin(searchProduct), HttpStatus.OK);
     }
 
  }

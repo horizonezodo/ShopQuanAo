@@ -26,5 +26,7 @@ public class ProductOutput {
     private boolean top;
     private List<Color> colors;
     private List<Size> sizes;
+    private double minPrice;
+    private double maxPrice;
     private List<Variant> listVariants;
 }

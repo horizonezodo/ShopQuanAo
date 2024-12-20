@@ -15,5 +15,5 @@ public class OrderItemInput {
     private Long orderId;
     private Long orderItemId;
     private int quantity;
-    private BigDecimal price;
+    private double price;
 }

@@ -12,6 +12,7 @@ import vn.horizonezodo.core.Entity.Size;
 import vn.horizonezodo.core.Entity.Variant;
 import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.Input.ProductInput;
+import vn.horizonezodo.core.Input.SearchProduct;
 import vn.horizonezodo.core.Input.VariantInput;
 import vn.horizonezodo.core.MongoRepo.ProductRepo;
 import vn.horizonezodo.core.Output.Message;
@@ -50,6 +51,8 @@ public class ProductService {
             productOutput.setListVariants(variants);
             productOutput.setTop(p.isTop());
             productOutput.setActivate(p.isActivate());
+            productOutput.setMinPrice(p.getMinPrice());
+            productOutput.setMaxPrice(p.getMaxPrice());
             productOutput.setViewCount(p.getViewCount());
             return productOutput;
         }).collect(Collectors.toList());
@@ -73,6 +76,8 @@ public class ProductService {
         productOutput.setSizes(sizes);
         productOutput.setViewCount(product.getViewCount());
         productOutput.setTop(product.isTop());
+        productOutput.setMinPrice(product.getMinPrice());
+        productOutput.setMaxPrice(product.getMaxPrice());
         productOutput.setActivate(product.isActivate());
         return productOutput;
     }
@@ -89,6 +94,18 @@ public class ProductService {
         product.setActivate(input.isActivate());
         repo.save(product);
         service.addAllVariant(input.getVariantInputs(), product.getId());
+        double max = input.getVariantInputs().stream()
+                .map(VariantInput::getPrice)
+                .max(Double::compare)
+                .orElse(Double.MIN_VALUE);
+
+        double min = input.getVariantInputs().stream()
+                .map(VariantInput::getPrice)
+                .min(Double::compare)
+                .orElse(Double.MAX_VALUE);
+        product.setMinPrice(min);
+        product.setMaxPrice(max);
+        repo.save(product);
         return new Message("Thêm sản phẩm thành công");
     }
 
@@ -141,6 +158,8 @@ public class ProductService {
                     List<Variant> variants = service.getListVariant(p.getId());
                     productOutput.setListVariants(variants);
                     productOutput.setTop(p.isTop());
+                    productOutput.setMinPrice(p.getMinPrice());
+                    productOutput.setMaxPrice(p.getMaxPrice());
                     productOutput.setViewCount(p.getViewCount());
                     return productOutput;
                 }).collect(Collectors.toList());
@@ -150,6 +169,110 @@ public class ProductService {
 
     public void addListVariant(List<VariantInput> variantInputs, String id) {
         Product product = repo.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy product theo id: " + id));
+        double max = variantInputs.stream()
+                .map(VariantInput::getPrice)
+                .max(Double::compare)
+                .orElse(Double.MIN_VALUE);
+
+        double min = variantInputs.stream()
+                .map(VariantInput::getPrice)
+                .min(Double::compare)
+                .orElse(Double.MAX_VALUE);
+        product.setMinPrice(min);
+        product.setMaxPrice(max);
+        repo.save(product);
         service.addAllVariant(variantInputs, id);
+    }
+
+    public void updateProductPrice(String id){
+        Product product = repo.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy product theo id: " + id));
+        List<Variant> variants = service.getListVariant(product.getId());
+        double max = variants.stream()
+                .map(Variant::getPrice)
+                .max(Double::compare)
+                .orElse(Double.MIN_VALUE);
+
+        double min = variants.stream()
+                .map(Variant::getPrice)
+                .min(Double::compare)
+                .orElse(Double.MAX_VALUE);
+        product.setMinPrice(min);
+        product.setMaxPrice(max);
+        repo.save(product);
+    }
+
+    public List<ProductOutput> get20TopProduct(){
+        List<Product> products = repo.findTop20ByTopAndActivateOrderByUpdateAtAsc(true, true);
+        List<ProductOutput> productOutputs = products.stream()
+                .map(p -> {
+                    ProductOutput productOutput = new ProductOutput();
+                    productOutput.setId(p.getId());
+                    productOutput.setProductName(p.getProductName());
+                    productOutput.setCreateAt(p.getUpdateAt());
+                    productOutput.setListImage(p.getListImg());
+                    productOutput.setThumbImg(p.getThumbImg());
+                    List<Variant> variants = service.getListVariant(p.getId());
+                    productOutput.setListVariants(variants);
+                    productOutput.setTop(p.isTop());
+                    productOutput.setActivate(p.isActivate());
+                    productOutput.setMinPrice(p.getMinPrice());
+                    productOutput.setMaxPrice(p.getMaxPrice());
+                    productOutput.setViewCount(p.getViewCount());
+                    return productOutput;
+                }).collect(Collectors.toList());
+        return productOutputs;
+    }
+
+    public List<ProductOutput> get20TopProductByCate(String cateId){
+        List<Product> products = repo.findTop20ByCategoryIdAndTopAndActivateOrderByIdAsc(cateId,true, true);
+        List<ProductOutput> productOutputs = products.stream()
+                .map(p -> {
+                    ProductOutput productOutput = new ProductOutput();
+                    productOutput.setId(p.getId());
+                    productOutput.setProductName(p.getProductName());
+                    productOutput.setCreateAt(p.getUpdateAt());
+                    productOutput.setListImage(p.getListImg());
+                    productOutput.setThumbImg(p.getThumbImg());
+                    List<Variant> variants = service.getListVariant(p.getId());
+                    productOutput.setListVariants(variants);
+                    productOutput.setTop(p.isTop());
+                    productOutput.setActivate(p.isActivate());
+                    productOutput.setMinPrice(p.getMinPrice());
+                    productOutput.setMaxPrice(p.getMaxPrice());
+                    productOutput.setViewCount(p.getViewCount());
+                    return productOutput;
+                }).collect(Collectors.toList());
+        return productOutputs;
+    }
+
+    public List<ProductOutput> searchPublicProduct(SearchProduct searchProduct){
+        List<Product> products = repo.searchPublicProduct(searchProduct.getKeyword(), searchProduct.getCateId(), searchProduct.getMinPrice(), searchProduct.getMaxPrice(), searchProduct.getStartDate(), searchProduct.getEndDate(), searchProduct.getViewCount(), searchProduct.getSortBy(), searchProduct.isActivate(), searchProduct.isTop(), searchProduct.getLimit());
+        return products.stream()
+                .map(p -> {
+                    ProductOutput productOutput = new ProductOutput();
+                    productOutput.setId(p.getId());
+                    productOutput.setProductName(p.getProductName());
+                    productOutput.setCreateAt(p.getUpdateAt());
+                    productOutput.setListImage(p.getListImg());
+                    productOutput.setThumbImg(p.getThumbImg());
+                    List<Variant> variants = service.getListVariant(p.getId());
+                    productOutput.setListVariants(variants);
+                    productOutput.setTop(p.isTop());
+                    productOutput.setActivate(p.isActivate());
+                    productOutput.setMinPrice(p.getMinPrice());
+                    productOutput.setMaxPrice(p.getMaxPrice());
+                    productOutput.setViewCount(p.getViewCount());
+                    return productOutput;
+                }).collect(Collectors.toList());
+    }
+
+    public Page<ProductOutput> searchProductForUser(SearchProduct searchProduct){
+        Pageable pageable = PageRequest.of(searchProduct.getPage(), searchProduct.getLimit());
+        return repo.searchProductsForUser(searchProduct.getKeyword(), searchProduct.getCateId(), searchProduct.getMinPrice(), searchProduct.getMaxPrice(), searchProduct.getStartDate(), searchProduct.getEndDate(), searchProduct.getViewCount(), searchProduct.getSortBy(), searchProduct.isActivate(), pageable);
+    }
+
+    public Page<ProductOutput> searchProductForAdmin(SearchProduct searchProduct){
+        Pageable pageable = PageRequest.of(searchProduct.getPage(), searchProduct.getLimit());
+        return repo.searchProductsForAdmin(searchProduct.getKeyword(), searchProduct.getCateId(), searchProduct.getMinPrice(), searchProduct.getMaxPrice(), searchProduct.getStartDate(), searchProduct.getEndDate(), searchProduct.getViewCount(), searchProduct.getSortBy(), pageable);
     }
 }

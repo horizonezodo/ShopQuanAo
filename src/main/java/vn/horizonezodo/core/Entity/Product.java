@@ -24,4 +24,6 @@ public class Product {
     private boolean isTop;
     private String categoryId;
     private boolean isActivate;
+    private double minPrice;
+    private double maxPrice;
 }

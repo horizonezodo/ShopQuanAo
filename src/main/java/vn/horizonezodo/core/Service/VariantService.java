@@ -57,12 +57,12 @@ public class VariantService {
         repo.save(variant);
     }
 
-    public Message updateVariant(VariantInput input){
+    public Message updateVariant(VariantInput input,String id){
         ColorInput colorInput = new ColorInput(input.getColorName(), input.getColorImg(),input.getProductId());
         Color color = colorService.updateColor(colorInput,input.getColorId());
         SizeInput sizeInput = new SizeInput(input.getSizeName(), input.getSizeDes(), input.getProductId());
         Size size = sizeService.updateSize(sizeInput, input.getSizeId());
-        Variant variant = getById(input.getId());
+        Variant variant = getById(id);
         variant.setSaleQuantity(input.getSaleQuantity());
         variant.setStock(input.isStock());
         variant.setPrice(input.getPrice());

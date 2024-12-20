@@ -11,7 +11,8 @@ import vn.horizonezodo.core.Entity.LogAPIType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogAPIInput {
-    private LogAPIType type;
+    private String id;
+    private String type;
     private String url;
     private String request;
     private String response;

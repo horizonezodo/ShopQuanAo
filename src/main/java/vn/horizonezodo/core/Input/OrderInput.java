@@ -17,7 +17,7 @@ public class OrderInput {
     private String productId;
     private String variantId;
     private int quantity;
-    private BigDecimal price;
+    private double price;
     private String shipingAddress;
     private String note;
     private String orderStatus;
