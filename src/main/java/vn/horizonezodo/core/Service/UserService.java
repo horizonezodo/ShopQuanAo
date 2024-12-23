@@ -44,7 +44,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserOutput saveUser(UserInput input){
+    public void saveUser(UserInput input){
         Wallet wallet = new Wallet();
         wallet.setAmount(0);
         wallet.setLockWallet(false);
@@ -54,6 +54,9 @@ public class UserService {
         user.setUsername(input.getUserName());
         user.setEmail(input.getEmail());
         user.setPassword(input.getPassword());
+        user.setAvatarImg(input.getImage());
+        user.setAddress(input.getAddress());
+        user.setBrithDay(input.getBirthDay());
         Role role = roleService.findByRoleName(input.getRole()).orElseThrow(() -> new MessageException("Role not found exception"));
         user.setRole(role);
         user.setWallet(wallet);
@@ -61,8 +64,8 @@ public class UserService {
         user.setLock(false);
         user.setActivate(false);
         repo.save(user);
-        UserOutput userOutput = new UserOutput(user.getUsername(),user.getEmail());
-        return userOutput;
+//        UserOutput userOutput = new UserOutput(user.getUsername(),user.getEmail());
+//        return userOutput;
     }
 
     @Transactional

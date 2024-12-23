@@ -17,16 +17,16 @@ import vn.horizonezodo.core.Exception.MessageException;
 import vn.horizonezodo.core.Input.UserInput;
 import vn.horizonezodo.core.Jwt.JwtUntil;
 import vn.horizonezodo.core.Output.Message;
+import vn.horizonezodo.core.Output.UserOutput;
 import vn.horizonezodo.core.Service.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 public class AuthController {
 
     @Autowired
@@ -69,11 +69,20 @@ public class AuthController {
                 ResponseCookie jwtCookie = until.generateJwtCookie(userDetail);
                 RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetail.getId());
                 ResponseCookie jwtRefreshCookie = until.generateRefreshJwtCookie(refreshToken.getToken());
-                //return new ResponseEntity<>(new Message("Đăng nhập thành công"), HttpStatus.OK);
+
+                User userData = service.getUserById(userDetail.getId()).orElseThrow(() -> new MessageException("Account không tồn tại"));
+                UserOutput output = new UserOutput();
+                output.setId(userData.getId());
+                output.setAddress(userData.getAddress());
+                output.setEmail(userData.getEmail());
+                output.setBrithDay(userData.getBrithDay());
+                output.setPhone(userData.getPhone());
+                output.setUserName(userData.getUsername());
+                output.setRole(userData.getRole().getRoleName().toString());
                 return ResponseEntity.ok()
                         .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                        .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())// Gửi cookie trong header
-                        .body("Đăng nhập thành công");
+                        .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                        .body(output);
             }
         }
         else{
