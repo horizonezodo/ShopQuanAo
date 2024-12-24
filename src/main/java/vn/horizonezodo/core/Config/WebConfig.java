@@ -13,13 +13,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import vn.horizonezodo.core.Jwt.AuthEntryPointJwt;
 import vn.horizonezodo.core.Jwt.AuthTokenFilter;
 import vn.horizonezodo.core.Service.UserDetailServiceImpl;
 
 @Configuration
 @EnableMethodSecurity
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private UserDetailServiceImpl detailService;
@@ -52,14 +54,24 @@ public class WebConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
+        http.csrf().disable()
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorized))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.antMatchers("/service/**").authenticated()
-                        .anyRequest().permitAll());
+                        .anyRequest().permitAll())
+                .cors();
         http.authenticationProvider(authProvider());
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("Content-Type", "Authorization")
+                .allowCredentials(true);
     }
 }

@@ -2,16 +2,12 @@ package vn.horizonezodo.core.MongoRepo;
 
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import vn.horizonezodo.core.Entity.Product;
-import vn.horizonezodo.core.Entity.Variant;
 import vn.horizonezodo.core.Output.ProductOutput;
 
 import java.util.List;
@@ -76,7 +72,6 @@ public class ProductRepoCustomImpl implements ProductRepoCustom{
         }else{
             query.with(pageable.getSort());
         }
-
         long total = mongoTemplate.count(query, Product.class);
         query.with(pageable);
 
@@ -198,7 +193,9 @@ public class ProductRepoCustomImpl implements ProductRepoCustom{
             query.with(Sort.by(Sort.Direction.DESC, "createAt"));
         }
         query.limit(limit);
-        return mongoTemplate.find(query, Product.class);
+        List<Product> products = mongoTemplate.find(query, Product.class);
+        return products;
+
     }
 
     private List<ProductOutput> buildData(List<Product> products){
